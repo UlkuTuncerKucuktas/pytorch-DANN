@@ -1,8 +1,39 @@
 import torch
 import numpy as np
-
+from kannata_mnist import KannadaMNISTDataset
 from model import Discriminator
 from utils import set_model_mode
+from torchvision import transforms
+from torch.utils.data import DataLoader
+
+base_transform = transforms.Compose([transforms.ToTensor(),
+                                transforms.Normalize((0.1307,), (0.3081,))
+                                ])
+
+kannada_mnist_test = KannadaMNISTDataset(csv_file='test.csv', transform=base_transform)
+kannada_mnist_loader = DataLoader(kannada_mnist_test, batch_size=32, shuffle=False)
+
+
+def unknown_accuracy(outputs, labels):
+    max_preds = torch.max(torch.softmax(outputs, dim=1), dim=1)
+    correct_unknowns = (max_preds.values < 0.5).sum().item()  
+    total = labels.size(0)
+    return correct_unknowns 
+
+def test_unknown_accuracy_for_kannada(model, dataloader, encoder, classifier):
+    model.eval()
+    correct_unknowns = 0
+    total = 0
+    with torch.no_grad():
+        for inputs, labels in dataloader:  
+            inputs = inputs.cuda()  
+            features = encoder(inputs)
+            outputs = classifier(features)
+            correct_unknowns += unknown_accuracy(outputs,labels)
+            total += inputs.size(0)
+    unknown_acc = correct_unknowns / total if total > 0 else 0
+    print(correct_unknowns,total, unknown_acc)
+    return correct_unknowns,total, unknown_acc
 
 
 def tester(encoder, classifier, discriminator, source_test_loader, target_test_loader, training_mode):
@@ -18,6 +49,8 @@ def tester(encoder, classifier, discriminator, source_test_loader, target_test_l
     source_correct = 0
     target_correct = 0
 
+    correct_kannada,total_kannada, kannada_unknown_accuracy = test_unknown_accuracy_for_kannada(classifier, kannada_mnist_loader,encoder, classifier)
+
     for batch_idx, (source_data, target_data) in enumerate(zip(source_test_loader, target_test_loader)):
         p = float(batch_idx) / len(source_test_loader)
         alpha = 2. / (1. + np.exp(-10 * p)) - 1
@@ -25,7 +58,7 @@ def tester(encoder, classifier, discriminator, source_test_loader, target_test_l
         # Process source and target data
         source_image, source_label = process_data(source_data, expand_channels=True)
         target_image, target_label = process_data(target_data)
-
+        
         # Compute source and target predictions
         source_pred = compute_output(encoder, classifier, source_image, alpha=None)
         target_pred = compute_output(encoder, classifier, target_image, alpha=None)
@@ -57,6 +90,11 @@ def tester(encoder, classifier, discriminator, source_test_loader, target_test_l
             "correct": target_correct,
             "total": target_dataset_len,
             "accuracy": calculate_accuracy(target_correct, target_dataset_len)
+        },
+        "Kannada Unknown": {
+            "correct": correct_kannada,
+            "total": total_kannada,
+            "accuracy": kannada_unknown_accuracy * 100  
         }
     }
 
