@@ -48,7 +48,6 @@ def tester(encoder, classifier, discriminator, source_test_loader, target_test_l
 
     source_correct = 0
     target_correct = 0
-
     correct_kannada,total_kannada, kannada_unknown_accuracy = test_unknown_accuracy_for_kannada(classifier, kannada_mnist_loader,encoder, classifier)
 
     for batch_idx, (source_data, target_data) in enumerate(zip(source_test_loader, target_test_loader)):
@@ -104,8 +103,9 @@ def tester(encoder, classifier, discriminator, source_test_loader, target_test_l
             "total": source_dataset_len + target_dataset_len,
             "accuracy": calculate_accuracy(domain_correct, source_dataset_len + target_dataset_len)
         }
-
+    
     print_accuracy(training_mode, accuracies)
+    return accuracies
 
 
 def process_data(data, expand_channels=False):

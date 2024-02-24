@@ -24,7 +24,7 @@ def source_only(encoder, classifier, source_train_loader, target_train_loader):
         list(encoder.parameters()) +
         list(classifier.parameters()),
         lr=0.01, momentum=0.9)
-
+    result_list = []
     for epoch in range(params.epochs):
         print(f"Epoch: {epoch}")
         set_model_mode('train', [encoder, classifier])
@@ -57,10 +57,11 @@ def source_only(encoder, classifier, source_train_loader, target_train_loader):
                 percentage_completed = 100. * batch_idx / len(source_train_loader)
                 print(f'[{total_processed}/{total_dataset} ({percentage_completed:.0f}%)]\tClassification Loss: {class_loss.item():.4f}')
 
-        test.tester(encoder, classifier, None, source_test_loader, target_test_loader, training_mode='Source_only')
-
+        accuracies = test.tester(encoder, classifier, None, source_test_loader, target_test_loader, training_mode='Source_only')
+        result_list.append(accuracies)
     save_model(encoder, classifier, None, 'Source-only')
     visualize(encoder, 'Source-only')
+    return result_list
 
 
 def dann(encoder, classifier, discriminator, source_train_loader, target_train_loader):
@@ -75,7 +76,7 @@ def dann(encoder, classifier, discriminator, source_train_loader, target_train_l
         list(discriminator.parameters()),
         lr=0.01,
         momentum=0.9)
-
+    result_list = []
     for epoch in range(params.epochs):
         print(f"Epoch: {epoch}")
         set_model_mode('train', [encoder, classifier, discriminator])
@@ -124,7 +125,8 @@ def dann(encoder, classifier, discriminator, source_train_loader, target_train_l
                 print('[{}/{} ({:.0f}%)]\tTotal Loss: {:.4f}\tClassification Loss: {:.4f}\tDomain Loss: {:.4f}'.format(
                     batch_idx * len(target_image), len(target_train_loader.dataset), 100. * batch_idx / len(target_train_loader), total_loss.item(), class_loss.item(), domain_loss.item()))
 
-        test.tester(encoder, classifier, discriminator, source_test_loader, target_test_loader, training_mode='DANN')
-
+        accuracies = test.tester(encoder, classifier, discriminator, source_test_loader, target_test_loader, training_mode='DANN')
+        result_list.append(accuracies)
     save_model(encoder, classifier, discriminator, 'DANN')
     visualize(encoder, 'DANN')
+    return result_list

@@ -14,6 +14,7 @@ class Extractor(nn.Module):
             nn.Conv2d(in_channels=32, out_channels=48, kernel_size=5, padding=2),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2)
+            
         )
 
     def forward(self, x):
@@ -29,6 +30,7 @@ class Classifier(nn.Module):
             nn.Linear(in_features=3 * 28 * 28, out_features=100),
             nn.ReLU(),
             nn.Linear(in_features=100, out_features=100),
+            
             nn.ReLU(),
             nn.Linear(in_features=100, out_features=10)
         )
