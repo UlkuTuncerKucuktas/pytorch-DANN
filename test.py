@@ -10,7 +10,7 @@ base_transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize((0.1307,), (0.3081,))
                                 ])
 
-kannada_mnist_test = KannadaMNISTDataset(csv_file='test.csv', transform=base_transform)
+kannada_mnist_test = KannadaMNISTDataset(csv_file='/content/pytorch-DANN/test.py', transform=base_transform)
 kannada_mnist_loader = DataLoader(kannada_mnist_test, batch_size=32, shuffle=False)
 
 
