@@ -16,7 +16,7 @@ kannada_mnist_loader = DataLoader(kannada_mnist_test, batch_size=32, shuffle=Fal
 
 def unknown_accuracy(outputs, labels):
     max_preds = torch.max(torch.softmax(outputs, dim=1), dim=1)
-    correct_unknowns = (max_preds.values < 0.5).sum().item()  
+    correct_unknowns = (max_preds.values < 0.7).sum().item()  
     total = labels.size(0)
     return correct_unknowns 
 

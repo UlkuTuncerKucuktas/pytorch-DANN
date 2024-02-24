@@ -19,6 +19,7 @@ class RandomSingleColorReplaceNonBlack():
         self.probability = p
 
     def __call__(self, img_tensor):
+        
         if torch.rand(1).item() > self.probability:
             return img_tensor
         random_color = torch.rand(3, device=img_tensor.device)

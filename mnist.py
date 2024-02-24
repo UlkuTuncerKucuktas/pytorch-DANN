@@ -26,7 +26,7 @@ transformations = {
     ]),
     "RandomErasing": transforms.Compose([
         transforms.ToTensor(),
-        transforms.RandomErasing(value=255,p=0.5,scale=(0.02, 0.10)),
+        transforms.RandomErasing(value=255,p=0.2,scale=(0.02, 0.10)),
         transforms.Normalize((0.1307,), (0.3081,))
     ]),
     "GaussianBlur": transforms.Compose([
@@ -50,29 +50,28 @@ transformations = {
         base_transform
     ]),
     "RandomSingleColorReplaceBlack": transforms.Compose([
+        base_transform,
         RandomSingleColorReplaceBlack(p=0.5),
-        base_transform
+        
     ]),
     "RandomSingleColorReplaceNonBlack": transforms.Compose([
+        base_transform,
         RandomSingleColorReplaceNonBlack(p=0.5),
-        base_transform
     ]),
     "RandomSingleColorReplaceAll": transforms.Compose([
+        base_transform,
         RandomSingleColorReplaceAll(p=0.5),
-        base_transform
     ]),
     "RandomColorsReplaceBlack": transforms.Compose([
+        base_transform,
         RandomColorsReplaceBlack(p=0.5),
-        base_transform
     ]),
     "RandomColorsReplaceNonBlack": transforms.Compose([
+        base_transform,
         RandomColorsReplaceNonBlack(p=0.5),
-        base_transform
     ]),
     "Identity": base_transform
 }
-
-
 
 
 aug_datasets_dict = {name: datasets.MNIST(root='../data/MNIST', train=True, download=True, transform=transform)
