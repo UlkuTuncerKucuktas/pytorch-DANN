@@ -36,7 +36,8 @@ def source_only(encoder, classifier, source_train_loader, target_train_loader):
             source_image, source_label = source_data
             p = float(batch_idx + start_steps) / total_steps
 
-            source_image = torch.cat((source_image, source_image, source_image), 1)  # MNIST convert to 3 channel
+            if source_image.shape[1] == 1:
+                source_image = torch.cat((source_image, source_image, source_image), 1)  # MNIST convert to 3 channel
             source_image, source_label = source_image.cuda(), source_label.cuda()  # 32
 
             optimizer = utils.optimizer_scheduler(optimizer=optimizer, p=p)
@@ -90,7 +91,8 @@ def dann(encoder, classifier, discriminator, source_train_loader, target_train_l
             p = float(batch_idx + start_steps) / total_steps
             alpha = 2. / (1. + np.exp(-10 * p)) - 1
 
-            source_image = torch.cat((source_image, source_image, source_image), 1)
+            if source_image.shape[1] == 1:
+                source_image = torch.cat((source_image, source_image, source_image), 1)
 
             source_image, source_label = source_image.cuda(), source_label.cuda()
             target_image, target_label = target_image.cuda(), target_label.cuda()

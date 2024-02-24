@@ -3,13 +3,24 @@ from torch.utils.data import SubsetRandomSampler, DataLoader
 from torchvision import transforms
 import torch
 import params
+from transformations import *
+
 
 transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize((0.1307,), (0.3081,))
                                 ])
 
+transform_replace_all = transforms.Compose([transforms.ToTensor(),
+                                RandomSingleColorReplaceAll(p=0.4),
+                                transforms.Normalize((0.1307,), (0.3081,))
+                                ])
+
 mnist_train_dataset = datasets.MNIST(root='../data/MNIST', train=True, download=True,
                                      transform=transform)
+
+mnist_train_dataset_replace_all =  datasets.MNIST(root='../data/MNIST', train=True, download=True,
+                                     transform=transform_replace_all)
+
 mnist_valid_dataset = datasets.MNIST(root='../data/MNIST', train=True, download=True,
                                      transform=transform)
 mnist_test_dataset = datasets.MNIST(root='../data/MNIST', train=False, transform=transform)
@@ -22,6 +33,13 @@ valid_sampler = SubsetRandomSampler(valid_idx)
 
 mnist_train_loader = DataLoader(
     mnist_train_dataset,
+    batch_size=params.batch_size,
+    sampler=train_sampler,
+    num_workers=params.num_workers
+)
+
+mnist_train_loader_replace_all = DataLoader(
+    mnist_train_dataset_replace_all,
     batch_size=params.batch_size,
     sampler=train_sampler,
     num_workers=params.num_workers
