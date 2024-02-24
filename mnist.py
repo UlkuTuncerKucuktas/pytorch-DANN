@@ -15,11 +15,26 @@ transform_replace_all = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize((0.1307,), (0.3081,))
                                 ])
 
+transform_replace_all = transforms.Compose([transforms.ToTensor(),
+                                RandomSingleColorReplaceAll(p=0.4),
+                                transforms.Normalize((0.1307,), (0.3081,))
+                                ])
+
+
+transform_random_erase = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.1307,), (0.3081,)),
+    transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)
+])
+
 mnist_train_dataset = datasets.MNIST(root='../data/MNIST', train=True, download=True,
                                      transform=transform)
 
 mnist_train_dataset_replace_all =  datasets.MNIST(root='../data/MNIST', train=True, download=True,
                                      transform=transform_replace_all)
+
+mnist_train_dataset_random_erase =  datasets.MNIST(root='../data/MNIST', train=True, download=True,
+                                     transform=transform_random_erase)
 
 mnist_valid_dataset = datasets.MNIST(root='../data/MNIST', train=True, download=True,
                                      transform=transform)
@@ -40,6 +55,13 @@ mnist_train_loader = DataLoader(
 
 mnist_train_loader_replace_all = DataLoader(
     mnist_train_dataset_replace_all,
+    batch_size=params.batch_size,
+    sampler=train_sampler,
+    num_workers=params.num_workers
+)
+
+mnist_train_loader_random_erase = DataLoader(
+    mnist_train_dataset_random_erase,
     batch_size=params.batch_size,
     sampler=train_sampler,
     num_workers=params.num_workers
