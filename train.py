@@ -24,6 +24,7 @@ def source_only(encoder, classifier, source_train_loader, target_train_loader):
         list(encoder.parameters()) +
         list(classifier.parameters()),
         lr=0.01, momentum=0.9)
+    
     result_list = []
     for epoch in range(params.epochs):
         print(f"Epoch: {epoch}")
@@ -41,13 +42,17 @@ def source_only(encoder, classifier, source_train_loader, target_train_loader):
             source_image, source_label = source_image.cuda(), source_label.cuda()  # 32
 
             optimizer = utils.optimizer_scheduler(optimizer=optimizer, p=p)
+            
             optimizer.zero_grad()
+
 
             source_feature = encoder(source_image)
 
             # Classification loss
             class_pred = classifier(source_feature)
             class_loss = classifier_criterion(class_pred, source_label)
+            if class_loss.isnan():
+              class_loss=1e-6
 
             class_loss.backward()
             optimizer.step()
@@ -100,7 +105,9 @@ def dann(encoder, classifier, discriminator, source_train_loader, target_train_l
             combined_image = torch.cat((source_image, target_image), 0)
 
             optimizer = utils.optimizer_scheduler(optimizer=optimizer, p=p)
+            
             optimizer.zero_grad()
+              
 
             combined_feature = encoder(combined_image)
             source_feature = encoder(source_image)
@@ -118,6 +125,8 @@ def dann(encoder, classifier, discriminator, source_train_loader, target_train_l
             domain_loss = discriminator_criterion(domain_pred, domain_combined_label)
 
             total_loss = class_loss + domain_loss
+            if total_loss.isnan():
+              total_loss=1e-6
             total_loss.backward()
             optimizer.step()
 

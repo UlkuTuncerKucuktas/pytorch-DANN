@@ -11,6 +11,14 @@ base_transform = transforms.Compose([
 ])
 
 
+
+'''
+"RandomErasing": transforms.Compose([
+        transforms.ToTensor(),
+        transforms.RandomErasing(value=255,p=0.2,scale=(0.02, 0.10)),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ]),
+'''
 transformations = {
     "RandomHorizontalFlip": transforms.Compose([
         transforms.RandomHorizontalFlip(p=0.5),
@@ -23,11 +31,6 @@ transformations = {
     "ColorJitter": transforms.Compose([
         transforms.ColorJitter(),
         base_transform
-    ]),
-    "RandomErasing": transforms.Compose([
-        transforms.ToTensor(),
-        transforms.RandomErasing(value=255,p=0.2,scale=(0.02, 0.10)),
-        transforms.Normalize((0.1307,), (0.3081,))
     ]),
     "GaussianBlur": transforms.Compose([
         transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
